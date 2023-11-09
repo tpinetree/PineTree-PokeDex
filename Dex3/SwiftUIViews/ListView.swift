@@ -13,14 +13,15 @@ struct ListView: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(viewModel.pokedex, id:\.self) { pokemon in
+                ForEach(viewModel.searchResults, id:\.self) { pokemon in
                     NavigationLink(value: pokemon) {
                         Cell(pokemon: pokemon)
                     }
-                    .listRowSeparator(.hidden)
+                    .listRowSeparator(.hidden, edges: .all)
                 }
                 
-                if viewModel.hasMorePagesToFetch() {
+                if viewModel.hasMorePagesToFetch(),
+                    !viewModel.startedSearching() /*avoid fetching more pokemons when presenting the searchResults (the results might have less elements than the screen height, which would show the HStack and fetch the pokemons)*/ {
                     HStack(alignment: .center) {
                         Spacer()
                         
@@ -44,6 +45,7 @@ struct ListView: View {
             }
             .listStyle(.plain)
             .navigationTitle("PineTree Pokedex")
+            .searchable(text: $viewModel.searchText)
             .navigationDestination(for: TempPokemon.self, destination: { pokemon in
                 PokemonDetail(pokemon: pokemon)
             })

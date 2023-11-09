@@ -21,6 +21,15 @@ class ViewModel: ObservableObject {
     
     @Published private(set) var pokedex: [TempPokemon] = []
     @Published private(set) var status: Status = .notStarted
+    @Published var searchText: String = ""
+    
+    var searchResults: [TempPokemon] {
+        guard !searchText.isEmpty else { return pokedex }
+        
+        return pokedex.filter { pokemon in
+            pokemon.name.lowercased().contains(searchText.lowercased())
+        }
+    }
     
     init(controller: FetchController) {
         self.controller = controller
@@ -52,5 +61,9 @@ class ViewModel: ObservableObject {
     
     func hasMorePagesToFetch() -> Bool {
         controller.nextPage?.absoluteString.isEmpty == false
+    }
+    
+    func startedSearching() -> Bool {
+        searchText.isEmpty == false
     }
 }
